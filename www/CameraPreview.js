@@ -78,6 +78,10 @@ CameraPreview.show = function(onSuccess, onError) {
   exec(onSuccess, onError, PLUGIN_NAME, "showCamera", []);
 };
 
+CameraPreview.setPhysicalZoom = function(zoomLevel, onSuccess, onError) {
+  exec(onSuccess, onError, "CameraPreview", "setPhysicalZoom", [zoomLevel]);
+};
+
 CameraPreview.takeSnapshot = function(opts, onSuccess, onError) {
   if (!opts) {
     opts = {};
