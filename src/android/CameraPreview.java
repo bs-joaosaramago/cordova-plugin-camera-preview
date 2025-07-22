@@ -214,18 +214,51 @@ public class CameraPreview extends CordovaPlugin implements CameraActivity.Camer
     }
   }
 
-  private void restartCameraWithId(final String cameraId) {
-    // Stop current camera preview
-    stopCamera();
-
-    // Update the current camera ID
-    this.cameraId = cameraId;
-
-    // Start the preview again with new camera ID
+  private void restartCameraWithId(final String newCameraId) {
     cordova.getActivity().runOnUiThread(new Runnable() {
         @Override
         public void run() {
-            startCamera();
+            try {
+                // Remove current fragment
+                if (fragment != null) {
+                    FragmentManager fragmentManager = cordova.getActivity().getFragmentManager();
+                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                    fragmentTransaction.remove(fragment);
+                    fragmentTransaction.commit();
+                    fragment = null;
+                }
+
+                // Recreate fragment with updated cameraId
+                fragment = new CameraActivity();
+                fragment.setEventListener(CameraPreview.this);
+                fragment.defaultCamera = newCameraId;
+                fragment.tapToTakePicture = true;
+                fragment.dragEnabled = false;
+                fragment.tapToFocus = true;
+                fragment.disableExifHeaderStripping = false;
+                fragment.storeToFile = true;
+                fragment.toBack = false;
+
+                // Example: reuse last known position, or re-init
+                fragment.setRect(0, 0, 1000, 1000); // Change this if needed
+
+                FrameLayout containerView = (FrameLayout) cordova.getActivity().findViewById(containerViewId);
+                if (containerView == null) {
+                    containerView = new FrameLayout(cordova.getActivity().getApplicationContext());
+                    containerView.setId(containerViewId);
+                    FrameLayout.LayoutParams containerLayoutParams = new FrameLayout.LayoutParams(
+                            FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
+                    cordova.getActivity().addContentView(containerView, containerLayoutParams);
+                }
+
+                FragmentManager fragmentManager = cordova.getActivity().getFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.add(containerView.getId(), fragment);
+                fragmentTransaction.commit();
+
+            } catch (Exception e) {
+                Log.e(TAG, "Error restarting camera with ID: " + newCameraId, e);
+            }
         }
     });
 }
