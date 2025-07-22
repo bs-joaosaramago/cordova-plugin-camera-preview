@@ -214,6 +214,22 @@ public class CameraPreview extends CordovaPlugin implements CameraActivity.Camer
     }
   }
 
+  private void restartCameraWithId(final String cameraId) {
+    // Stop current camera preview
+    stopCameraPreview();
+
+    // Update the current camera ID
+    this.cameraId = cameraId;
+
+    // Start the preview again with new camera ID
+    cordova.getActivity().runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+            startCameraPreview();
+        }
+    });
+}
+
   public void setPhysicalZoom(final CallbackContext callbackContext, final float zoomLevel) {
     try {
         CameraManager manager = (CameraManager) cordova.getActivity().getSystemService(Context.CAMERA_SERVICE);
