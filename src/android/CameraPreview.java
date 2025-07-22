@@ -294,9 +294,9 @@ public class CameraPreview extends CordovaPlugin implements CameraActivity.Camer
             boolean match = false;
 
             // Match physical zoom (no interpolation)
-            if (zoomLevel == 0.5 && focal < 25f) match = true;
-            if (zoomLevel == 1.0 && focal >= 25f && focal < 35f) match = true;
-            if (zoomLevel == 2.0 && focal >= 50f) match = true;
+            if (zoomLevel == 0.5 && focal < 20f) match = true;
+            else if (zoomLevel == 1.0 && focal >= 20f && focal < 35f) match = true;
+            else if (zoomLevel == 2.0 && focal >= 35f) match = true;
 
             if (match) {
                 bestCameraId = cameraId;
