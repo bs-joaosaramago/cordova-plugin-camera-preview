@@ -214,6 +214,44 @@ public class CameraPreview extends CordovaPlugin implements CameraActivity.Camer
     }
   }
 
+  public void setPhysicalZoom(final CallbackContext callbackContext, final float zoomLevel) {
+    try {
+        CameraManager manager = (CameraManager) cordova.getActivity().getSystemService(Context.CAMERA_SERVICE);
+        String bestCameraId = null;
+
+        for (String cameraId : manager.getCameraIdList()) {
+            CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
+            Integer facing = characteristics.get(CameraCharacteristics.LENS_FACING);
+            if (facing == null || facing != CameraCharacteristics.LENS_FACING_BACK) continue;
+
+            float[] focalLengths = characteristics.get(CameraCharacteristics.LENS_INFO_AVAILABLE_FOCAL_LENGTHS);
+            if (focalLengths == null || focalLengths.length == 0) continue;
+
+            float focal = focalLengths[0];
+            boolean match = false;
+
+            // Match physical zoom (no interpolation)
+            if (zoomLevel == 0.5 && focal < 25f) match = true;
+            if (zoomLevel == 1.0 && focal >= 25f && focal < 35f) match = true;
+            if (zoomLevel == 2.0 && focal >= 50f) match = true;
+
+            if (match) {
+                bestCameraId = cameraId;
+                break;
+            }
+        }
+
+        if (bestCameraId != null) {
+            restartCameraWithId(bestCameraId);
+            callbackContext.success("Switched to lens with zoom: " + zoomLevel);
+        } else {
+            callbackContext.error("No physical lens matches zoom level: " + zoomLevel);
+        }
+    } catch (Exception e) {
+        callbackContext.error("Error in setPhysicalZoom: " + e.getMessage());
+    }
+}
+
   private boolean hasView(CallbackContext callbackContext) {
     if(fragment == null) {
       callbackContext.error("No preview");
