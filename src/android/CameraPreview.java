@@ -74,6 +74,8 @@ public class CameraPreview extends CordovaPlugin implements CameraActivity.Camer
   private static final String SET_WHITE_BALANCE_MODE_ACTION = "setWhiteBalanceMode";
   private static final String SET_BACK_BUTTON_CALLBACK = "onBackButton";
   private static final String GET_CAMERA_CHARACTERISTICS_ACTION = "getCameraCharacteristics";
+  private static final String SET_PHYSICAL_ZOOM_ACTION = "setPhysicalZoom";
+
 
   private static final int CAM_REQ_CODE = 0;
   private static final int VID_REQ_CODE = 1;
@@ -193,6 +195,8 @@ public class CameraPreview extends CordovaPlugin implements CameraActivity.Camer
       return getSupportedColorEffects(callbackContext);
     } else if (GET_CAMERA_CHARACTERISTICS_ACTION.equals(action)) {
       return getCameraCharacteristics(callbackContext);
+    }else if (SET_PHYSICAL_ZOOM_ACTION.equals(action)) {
+      return handleSetPhysicalZoom(args, callbackContext);
     }
 
     return false;
