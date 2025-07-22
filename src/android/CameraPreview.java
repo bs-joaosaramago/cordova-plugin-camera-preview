@@ -216,7 +216,7 @@ public class CameraPreview extends CordovaPlugin implements CameraActivity.Camer
 
   private void restartCameraWithId(final String cameraId) {
     // Stop current camera preview
-    stopCameraPreview();
+    stopCamera();
 
     // Update the current camera ID
     this.cameraId = cameraId;
@@ -225,7 +225,7 @@ public class CameraPreview extends CordovaPlugin implements CameraActivity.Camer
     cordova.getActivity().runOnUiThread(new Runnable() {
         @Override
         public void run() {
-            startCameraPreview();
+            startCamera();
         }
     });
 }
