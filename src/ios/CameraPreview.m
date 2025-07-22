@@ -794,4 +794,34 @@
     return filePath;
 }
 
+- (void)setPhysicalZoom:(CDVInvokedUrlCommand*)command {
+    float zoom = [command.arguments[0] floatValue];
+    NSString* desiredType = nil;
+
+    if (zoom <= 0.5) {
+        desiredType = AVCaptureDeviceTypeBuiltInUltraWideCamera;
+    } else if (zoom <= 1.0) {
+        desiredType = AVCaptureDeviceTypeBuiltInWideAngleCamera;
+    } else if (zoom >= 2.0) {
+        desiredType = AVCaptureDeviceTypeBuiltInTelephotoCamera;
+    }
+
+    AVCaptureDeviceDiscoverySession* session = [AVCaptureDeviceDiscoverySession 
+        discoverySessionWithDeviceTypes:@[desiredType]
+        mediaType:AVMediaTypeVideo
+        position:AVCaptureDevicePositionBack];
+
+    NSArray* devices = session.devices;
+    if (devices.count > 0) {
+        [self switchToDevice:devices[0]];
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    } else {
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR 
+                                                          messageAsString:@"No physical lens found"];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }
+}
+
+
 @end
