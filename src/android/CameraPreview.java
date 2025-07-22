@@ -281,6 +281,11 @@ public class CameraPreview extends CordovaPlugin implements CameraActivity.Camer
     try {
         CameraManager manager = (CameraManager) cordova.getActivity().getSystemService(Context.CAMERA_SERVICE);
         String bestCameraId = null;
+        float bestFocalLength = -1;
+        float bestDiff = Float.MAX_VALUE;
+
+        // Estimate ideal focal length for requested zoom level (assumes 25mm base for 1x)
+        float desiredFocal = zoomLevel * 25f;
 
         for (String cameraId : manager.getCameraIdList()) {
             CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
@@ -291,26 +296,26 @@ public class CameraPreview extends CordovaPlugin implements CameraActivity.Camer
             if (focalLengths == null || focalLengths.length == 0) continue;
 
             float focal = focalLengths[0];
-            boolean match = false;
+            float diff = Math.abs(focal - desiredFocal);
 
-            // Match physical zoom (no interpolation)
-            if (zoomLevel == 0.5 && focal < 20f) match = true;
-            else if (zoomLevel == 1.0 && focal >= 20f && focal < 35f) match = true;
-            else if (zoomLevel == 2.0 && focal >= 35f) match = true;
+            Log.d(TAG, "Camera ID: " + cameraId + ", Focal Length: " + focal + ", Diff: " + diff);
 
-            if (match) {
+            if (diff < bestDiff) {
                 bestCameraId = cameraId;
-                break;
+                bestFocalLength = focal;
+                bestDiff = diff;
             }
         }
 
         if (bestCameraId != null) {
+            Log.d(TAG, "Best match camera ID: " + bestCameraId + ", Focal Length: " + bestFocalLength);
             restartCameraWithId(bestCameraId);
-            callbackContext.success("Switched to lens with zoom: " + zoomLevel);
+            callbackContext.success("Switched to physical zoom: " + zoomLevel + "x");
         } else {
-            callbackContext.error("No physical lens matches zoom level: " + zoomLevel);
+            callbackContext.error("No suitable physical lens found for zoom: " + zoomLevel);
         }
     } catch (Exception e) {
+        Log.e(TAG, "Error in setPhysicalZoom: ", e);
         callbackContext.error("Error in setPhysicalZoom: " + e.getMessage());
     }
 }
