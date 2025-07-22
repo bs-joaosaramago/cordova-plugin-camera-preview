@@ -266,6 +266,16 @@ public class CameraPreview extends CordovaPlugin implements CameraActivity.Camer
         }
     });
 }
+  private boolean handleSetPhysicalZoom(JSONArray args, CallbackContext callbackContext) {
+  try {
+    float zoomLevel = (float) args.getDouble(0);
+    setPhysicalZoom(callbackContext, zoomLevel);
+    return true;
+  } catch (JSONException e) {
+    callbackContext.error("Invalid arguments for setPhysicalZoom: " + e.getMessage());
+    return false;
+  }
+}
 
   public void setPhysicalZoom(final CallbackContext callbackContext, final float zoomLevel) {
     try {
