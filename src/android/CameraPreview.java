@@ -7,7 +7,7 @@ import android.content.ContextWrapper;
 import android.content.pm.PackageManager;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.app.Fragment
+import android.app.Fragment;
 import android.hardware.Camera;
 import android.os.Build;
 import android.os.Handler;
