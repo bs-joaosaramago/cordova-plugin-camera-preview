@@ -218,12 +218,12 @@ public class CameraPreview extends CordovaPlugin implements CameraActivity.Camer
     }
   }
 
-  private void restartCameraWithId(final String newCameraId) {
+ private void restartCameraWithId(final String newCameraId, final float opticalZoomLevel) {
     cordova.getActivity().runOnUiThread(new Runnable() {
         @Override
         public void run() {
             try {
-                // Remove current fragment
+                // Remove current fragment if exists
                 if (fragment != null) {
                     FragmentManager fragmentManager = cordova.getActivity().getFragmentManager();
                     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -232,10 +232,15 @@ public class CameraPreview extends CordovaPlugin implements CameraActivity.Camer
                     fragment = null;
                 }
 
-                // Recreate fragment with updated cameraId
+                // Create new fragment with updated camera ID
                 fragment = new CameraActivity();
                 fragment.setEventListener(CameraPreview.this);
                 fragment.defaultCamera = newCameraId;
+
+                // 💡 Pass optical zoom level to the fragment
+                fragment.opticalZoomLevel = opticalZoomLevel;
+
+                // Basic settings (can be adapted)
                 fragment.tapToTakePicture = true;
                 fragment.dragEnabled = false;
                 fragment.tapToFocus = true;
@@ -243,8 +248,7 @@ public class CameraPreview extends CordovaPlugin implements CameraActivity.Camer
                 fragment.storeToFile = true;
                 fragment.toBack = false;
 
-                // Example: reuse last known position, or re-init
-                fragment.setRect(0, 0, 1000, 1000); // Change this if needed
+                fragment.setRect(0, 0, 1000, 1000); // Adjust dimensions as needed
 
                 FrameLayout containerView = (FrameLayout) cordova.getActivity().findViewById(containerViewId);
                 if (containerView == null) {
@@ -309,7 +313,7 @@ public class CameraPreview extends CordovaPlugin implements CameraActivity.Camer
 
         if (bestCameraId != null) {
             Log.d(TAG, "Best match camera ID: " + bestCameraId + ", Focal Length: " + bestFocalLength);
-            restartCameraWithId(bestCameraId);
+            restartCameraWithId(bestCameraId, bestFocalLength);
             callbackContext.success("Switched to physical zoom: " + zoomLevel + "x");
         } else {
             callbackContext.error("No suitable physical lens found for zoom: " + zoomLevel);
