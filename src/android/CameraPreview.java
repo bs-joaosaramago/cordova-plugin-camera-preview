@@ -7,6 +7,7 @@ import android.content.ContextWrapper;
 import android.content.pm.PackageManager;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.app.Fragment
 import android.hardware.Camera;
 import android.os.Build;
 import android.os.Handler;
@@ -34,6 +35,75 @@ import java.io.File;
 import java.util.List;
 import java.util.Arrays;
 import java.util.ArrayList;
+
+import android.os.Bundle;
+import android.view.LayoutInflater;
+
+
+public class CameraActivity extends Fragment {
+
+    private static final String TAG = "CameraActivity";
+
+    private float opticalZoomLevel = 1.0f;
+
+    // Listener interface to send events back (example)
+    public interface CameraPreviewListener {
+        void onCameraReady();
+        void onPictureTaken(byte[] data);
+        // Add other callbacks as needed
+    }
+
+    private CameraPreviewListener eventListener;
+
+    public void setEventListener(CameraPreviewListener listener) {
+        this.eventListener = listener;
+    }
+
+    // Camera selection id
+    public String defaultCamera;
+
+    // Various settings (set these publicly or via setters)
+    public boolean tapToTakePicture = true;
+    public boolean dragEnabled = false;
+    public boolean tapToFocus = true;
+    public boolean disableExifHeaderStripping = false;
+    public boolean storeToFile = true;
+    public boolean toBack = false;
+
+    // Optical zoom property setter/getter
+    public void setOpticalZoomLevel(float level) {
+        this.opticalZoomLevel = level;
+        Log.d(TAG, "Optical zoom set to: " + level);
+    }
+
+    public float getOpticalZoomLevel() {
+        return opticalZoomLevel;
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        // Inflate your camera layout here or create programmatically
+        // For now, return an empty View placeholder
+
+        View view = new View(getActivity());
+
+        // TODO: Initialize camera, apply opticalZoomLevel, etc.
+
+        if (eventListener != null) {
+            eventListener.onCameraReady();
+        }
+
+        return view;
+    }
+
+    // Add your camera setup, preview, capture logic here
+
+    public void setRect(int left, int top, int right, int bottom) {
+        // Implement to set preview frame dimensions if needed
+        Log.d(TAG, "Setting preview rect: " + left + "," + top + "," + right + "," + bottom);
+    }
+}
+
 
 public class CameraPreview extends CordovaPlugin implements CameraActivity.CameraPreviewListener {
 
