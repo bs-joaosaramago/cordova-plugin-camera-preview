@@ -170,6 +170,8 @@ public class CameraPreview extends CordovaPlugin implements CameraActivity.Camer
 
   private ViewParent webViewParent;
 
+  private float opticalZoomLevel = 1.0f;
+
   private int containerViewId = 20; //<- set to random number to prevent conflict with other plugins
   public CameraPreview(){
     super();
